@@ -1,4 +1,5 @@
  const express = require("express");
+ require('./db')
  const userRoutes = require("./routes/user")
 
  const app = express();
