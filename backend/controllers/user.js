@@ -110,7 +110,7 @@ exports.forgetPassword = async (req, res) => {
 
     transport.sendMail({ from: 'security@app.com', to: email, subject: "RESET Forgot Password", html: `<p>RESET Forgot Password</p>  <h1><a href="${resetPasswordURL}"></a></h1>` })
 
-    sendError(res, "Please Verify your email . OTP has been RE - Sent to Your Email Account AGAIN !", 201);
+    sendError(res, "RESET Forgot Password sent to Your MAIL Please Check. !", 201);
 
 
 }
