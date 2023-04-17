@@ -93,7 +93,7 @@ exports.forgetPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return sendError(res, "Email Missing");
 
-    const user = await user.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) return sendError(res, "User Email Not Found", 404);
 
     const alreadyHasToken = await passResetToken.findOne({ owner: user._id })
@@ -108,9 +108,34 @@ exports.forgetPassword = async (req, res) => {
 
     var transport = generateMailTransporter();
 
-    transport.sendMail({ from: 'security@app.com', to: email, subject: "RESET Forgot Password", html: `<p>RESET Forgot Password</p>  <h1><a href="${resetPasswordURL}"></a></h1>` })
+    transport.sendMail({ from: 'security@app.com', to: email, subject: "RESET Forgot Password", html: `<p>RESET Forgot Password</p>  <a href="${resetPasswordURL}">Reset Password</a>` })
 
     sendError(res, "RESET Forgot Password sent to Your MAIL Please Check. !", 201);
+}
 
+exports.sendResetPasswordTokenStatus = (req, res) => {
+    res.json({ valid: true });
+}
+
+exports.resetPassword = async (req, res) => {
+    const { newPassword, userId } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.json({ error: "Invalid User Id" });
+
+    const matched = await user.comparePassword(newPassword);
+
+    if (matched) return sendError(res, "Please Enter new Password");
+
+    user.password = newPassword;
+    await user.save();
+
+    var transport = generateMailTransporter();
+
+    transport.sendMail({ from: 'security@app.com', to: user.email, subject: "Password RESET Successfully", html: `<p>Password RESET Successfully</p>` })
+
+    await passResetToken.findByIdAndDelete(req.resetToken._id)
+
+    res.json({ message: "Password Changed Successfully." })
 
 }
