@@ -10,6 +10,7 @@ exports.generateRandomByte = () => {
             if (err) reject(err);
 
             const buffString = buff.toString('hex');
+            console.log(buffString);
             resolve(buffString);
         })
     })
