@@ -7,7 +7,7 @@ function Navbar() {
     <div className="bg-secondary">
       <Container className="p-2">
         <div className="flex justify-between items-center">
-          <img src="./Review.png" alt="" srcset="" className='h-10' />
+          <img src="./Review.png" alt="Review LOGO" srcset="" className='h-10' />
           <ul className='flex items-center space-x-4'>
             <li>
               <button className='bg-dark-subtle p-1 rounded'>
