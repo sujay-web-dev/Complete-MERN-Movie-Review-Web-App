@@ -28,7 +28,13 @@ exports.create = async (req, res) => {
 
     transport.sendMail({ from: 'verification@app.com', to: newUser.email, subject: "Email Verification", html: `<p>Your Verification OTP</p> <h1>${OTP}</h1>` })
 
-    sendError(res, "Please Verify your email . OTP has been Sent to Your Email Account!", 201)
+    res.status(201).json({
+        user: {
+            id: newUser._id,
+            name: newUser.name,
+            email: newUser.email
+        }
+    })
 }
 
 // verifyEmail
