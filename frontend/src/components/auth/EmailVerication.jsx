@@ -4,14 +4,30 @@ import Title from '../form/Title'
 import Submit from '../form/Submit'
 import { commonModalClasses } from '../../utils/theme';
 import FormContainer from '../form/FormContainer';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { verifyUserEmail } from '../../api/auth';
+import { useNotification } from '../../hooks';
 
 const OTP_LENGTH = 6;
+
+const isValidOTP = (otp) => {
+    let valid = false;
+    for (let val of otp) {
+        valid = !isNaN(parseInt(val));
+        if (!valid) break;
+    }
+    return valid
+}
 
 function EmailVerication() {
 
     const [otp, setOtp] = useState(new Array(OTP_LENGTH).fill(""));
     const [activeOtpIndex, setActiveOtpIndex] = useState(0);
     const inputRef = useRef();
+
+    const navigate = useNavigate();
+    const { state } = useLocation();
+    const user = state?.user;
 
     const focusNextInputField = (index) => {
         setActiveOtpIndex(index + 1)
@@ -38,6 +54,25 @@ function EmailVerication() {
         inputRef.current?.focus()
     }, [activeOtpIndex]);
 
+    const { updateNotification } = useNotification()
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!isValidOTP(otp))
+            return updateNotification("error", "Invalid OTP");
+
+        const { error, message } = await verifyUserEmail({ OTP: otp.join(""), userId: user.id })
+
+        if (error) return updateNotification("error", error);
+
+        updateNotification("success", message);
+    }
+
+    useEffect(() => {
+        if (!user) navigate("/not-found")
+    }, [user])
+
+
     const handleKeyDown = ({ key }, index) => {
         if (key === "Backspace") {
             focusPrevInputField(index);
@@ -45,11 +80,10 @@ function EmailVerication() {
 
     }
 
-
     return (
         <FormContainer>
             <Container>
-                <form className={commonModalClasses}>
+                <form onSubmit={handleSubmit} className={commonModalClasses}>
                     <div>
                         <Title>Please Enter the OTP to verify your Account</Title>
                         <p className='text-center dark:text-dark-subtle text-light-subtle'>OTP has been sent to your Email</p>
@@ -66,7 +100,7 @@ function EmailVerication() {
 
                         })}
                     </div>
-                    <Submit value="Send Link" />
+                    <Submit value="Verify Account" />
                 </form>
             </Container>
         </FormContainer>

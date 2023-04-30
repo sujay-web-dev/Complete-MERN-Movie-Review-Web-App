@@ -7,6 +7,8 @@ import CustomLink from '../CustomLink'
 import FormContainer from '../form/FormContainer'
 import { commonModalClasses } from '../../utils/theme'
 import { createUser } from '../../api/auth'
+import { useNavigate } from 'react-router-dom'
+import { useNotification } from '../../hooks'
 
 function SignUp() {
 
@@ -18,6 +20,10 @@ function SignUp() {
 
     const { name, email, password } = userInfo;
 
+    const navigate = useNavigate();
+
+    const { updateNotification } = useNotification()
+
     const handleChange = ({ target }) => {
         const { value, name } = target;
         setUserInfo({ ...userInfo, [name]: value })
@@ -27,11 +33,17 @@ function SignUp() {
         e.preventDefault();
         const { ok, error } = validateUserInfo(userInfo)
 
-        if (!ok) return console.log(error);
+        if (!ok) return updateNotification("error", error);
 
         const response = await createUser(userInfo);
-        if (response.error) return console.log(response.error);
-        console.log(response.user);
+        if (response.error) return updateNotification("error", response.error);
+
+        navigate('/auth/verification', {
+            state: { user: response.user },
+            replace: true // will not allow to back in browser
+        });
+
+        updateNotification("success", "User Signed Up Successfully");
     }
 
     const validateUserInfo = ({ name, email, password }) => {
