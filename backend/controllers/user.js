@@ -28,7 +28,13 @@ exports.create = async (req, res) => {
 
     transport.sendMail({ from: 'verification@app.com', to: newUser.email, subject: "Email Verification", html: `<p>Your Verification OTP</p> <h1>${OTP}</h1>` })
 
-    sendError(res, "Please Verify your email . OTP has been Sent to Your Email Account!", 201)
+    res.status(201).json({
+        user: {
+            id: newUser._id,
+            name: newUser.name,
+            email: newUser.email
+        }
+    })
 }
 
 // verifyEmail
@@ -60,7 +66,7 @@ exports.verifyEmail = async (req, res) => {
 
     transport.sendMail({ from: 'verification@app.com', to: user.email, subject: "Email Verified", html: `<p>Email Verified OTP</p> <h1>Successfully</h1>` })
 
-    sendError(res, "Your Email is verified", 201);
+    res.json({ message: "Your email is verified." });
 
 }
 
@@ -86,8 +92,7 @@ exports.resendEmailVeriFicationToken = async function (req, res) {
     var transport = generateMailTransporter();
     transport.sendMail({ from: 'verification@app.com', to: oldUserId.email, subject: "Email Verification", html: `<p>Your Verification OTP sent Again</p> <h1>${OTP}</h1>` })
 
-    sendError(res, "Please Verify your email . OTP has been RE - Sent to Your Email Account AGAIN !", 201);
-
+    res.status(201).json({ message: "Please Verify your email . OTP has been RE - Sent to Your Email Account AGAIN !" });
 }
 
 exports.forgetPassword = async (req, res) => {
@@ -111,7 +116,8 @@ exports.forgetPassword = async (req, res) => {
 
     transport.sendMail({ from: 'security@app.com', to: email, subject: "RESET Forgot Password", html: `<p>RESET Forgot Password</p>  <a href="${resetPasswordURL}">Reset Password</a>` })
 
-    sendError(res, "RESET Forgot Password sent to Your MAIL Please Check. !", 201);
+    res.status(201).json({ message: "RESET Forgot Password sent to Your MAIL Please Check. !" });
+
 }
 
 exports.sendResetPasswordTokenStatus = (req, res) => {
