@@ -66,7 +66,17 @@ exports.verifyEmail = async (req, res) => {
 
     transport.sendMail({ from: 'verification@app.com', to: user.email, subject: "Email Verified", html: `<p>Email Verified OTP</p> <h1>Successfully</h1>` })
 
-    res.json({ message: "Your email is verified." });
+    const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
+    res.json({
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            token: jwtToken
+        },
+        message: "Your email is verified."
+    });
 
 }
 
