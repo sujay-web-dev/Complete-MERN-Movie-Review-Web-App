@@ -29,7 +29,8 @@ function SignIn() {
     });
 
     const { updateNotification } = useNotification();
-    const {handleLogin,authInfo} = useAuth();
+    const { handleLogin, authInfo } = useAuth();
+    const { isPending } = authInfo
 
     const handleChange = ({ target }) => {
         const { value, name } = target;
@@ -41,7 +42,7 @@ function SignIn() {
         const { ok, error } = validateUserInfo(userInfo)
 
         if (!ok) return updateNotification("error", error);
-        handleLogin(userInfo.email,userInfo.password)
+        handleLogin(userInfo.email, userInfo.password)
     }
 
     return (
@@ -51,7 +52,7 @@ function SignIn() {
                     <Title>Sign In</Title>
                     <FormInput value={userInfo.email} onChange={handleChange} label='Email' placeholder="tom@email.com" name="email" />
                     <FormInput type="password" value={userInfo.password} onChange={handleChange} label='Password' placeholder="*****" name="password" />
-                    <Submit value="Sign In" />
+                    <Submit value="Sign In" busy={isPending} />
                     <div className='flex justify-between'>
                         <CustomLink to="/auth/forget-password">Forget Password</CustomLink>
                         <CustomLink to="/auth/signup">Sign Up</CustomLink>
